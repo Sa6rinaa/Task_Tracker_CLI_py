@@ -6,25 +6,22 @@ finis=[]  # liste globale pour stocker les tâches terminées
 
 
 
+
 def ajouter_tache():
-    try :
-        with open("fichier.json", "r") as task :
-            task_list = json.load(task)   
-    except FileNotFoundError:
-        task_list = []                      # si le fichier n'existe pas, on crée une liste vide
-    except json.JSONDecodeError:
-        print("Erreur de format JSON")
-        task_list = []                      # liste vide si le JSON est mal formé
+    try:
+        with open("fichier.json", "r") as f:
+            task_list = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        task_list = []
 
+    texte = input("Saisir la tâche : ")
+    nouvelle_tache = {"nom": texte, "terminee": False}  # ✅ dictionnaire
+    task_list.append(nouvelle_tache)
 
-    task = input("Saisir la tâche : ")
-    task_list.append(task)   # on ajoute la tâche à la liste globale
-    print(task_list)          # on affiche la liste actuelle
-    
     with open("fichier.json", "w") as f:
-        json.dump(task_list, f)
-    print("Tâche ajoutée !")
+        json.dump(task_list, f, indent=4)
 
+    print("Tâche ajoutée !")
 
 
 def lister_tache():
@@ -73,24 +70,29 @@ def supprimer_tache():
 
 def Tâche_faites():
     try:
-        with open("fichier.json", "r") as terminer :
-            finis = json.load(terminer)   
-    except FileNotFoundError:
-        finis = []                      # si le fichier n'existe pas, on crée une liste vide
-    except json.JSONDecodeError:
-        print("Erreur de format JSON")
-        finis = []                      # liste vide si le JSON est mal formé
-    print(terminer)          # on affiche la liste actuelle
+        with open("fichier.json", "r") as f:
+            task_list = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        task_list = []
 
+    # Demander quelle tâche est terminée
+    nom_tache = input("Saisir la tâche terminée : ")
 
+    # Chercher dans la liste
+    trouve = False
+    for tache in task_list:
+        if tache["nom"] == nom_tache:
+            tache["terminee"] = True   # ✅ on met à jour le champ
+            trouve = True
+            print(f"Tâche '{nom_tache}' marquée comme terminée !")
+            break
 
-    terminer=input("Saisir la tâche terminée : ")
-    finis.append(terminer)
-    print(finis)
+    if not trouve:
+        print("Tâche non trouvée.")
 
-with open("fichier.json", "w") as f:
-        json.dump(finis, f)
-        print("Tâche TERMINER !")
+    # Réécrire la liste dans le fichier
+    with open("fichier.json", "w") as f:
+        json.dump(task_list, f, indent=4)
 
 
 
